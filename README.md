@@ -1,14 +1,9 @@
-         ___        ______     ____ _                 _  ___  
-        / \ \      / / ___|   / ___| | ___  _   _  __| |/ _ \ 
-       / _ \ \ /\ / /\___ \  | |   | |/ _ \| | | |/ _` | (_) |
-      / ___ \ V  V /  ___) | | |___| | (_) | |_| | (_| |\__, |
-     /_/   \_\_/\_/  |____/   \____|_|\___/ \__,_|\__,_|  /_/ 
- ----------------------------------------------------------------- 
+# sam-PresignedS3Trigger
 
+There are 2 pieces to this:
 
-Hi there! Welcome to AWS Cloud9!
+Upload - The upload script
+sam-imageprocessor - The SAM application, this has two functions:
+    PreSign - Create a presigned URL
+    trigger - Trigger when a new file has been uploaded
 
-To get started, create some files, play with the terminal,
-or visit https://docs.aws.amazon.com/console/cloud9/ for our documentation.
-
-Happy coding!

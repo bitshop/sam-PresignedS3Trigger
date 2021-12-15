@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM-OCRDemo
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Parameters:
+  BucketNamePrefix:
+    Type: String
+    Default: sr-example
+
+Resources:
+  PreSignFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: PreSign/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Events:
+        HelloWorld:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /PreSign
+            Method: get
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Sub "${BucketNamePrefix}-get-object-python3"
+
+  Bucket1:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub "${BucketNamePrefix}-get-object-python3"
+
+  s3getobjectpython3:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      CodeUri: trigger/
+      Description: >-
+        An Amazon S3 trigger that retrieves metadata for the object that has
+        been updated.
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Sub "${BucketNamePrefix}-get-object-python3"
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: Bucket1
+            Events:
+              - 's3:ObjectCreated:*'
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  PreSignApi:
+    Description: "API Gateway endpoint URL for Prod stage for Presign function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/PreSign/"
+  PreSignFunction:
+    Description: "Get Presigned Lambda Function ARN"
+    Value: !GetAtt PreSignFunction.Arn
+  PreSignFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt PreSignFunctionRole.Arn
